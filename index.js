@@ -2,7 +2,14 @@ import 'ol/ol.css';
 import {Map, View} from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
+import {defaults} from 'ol/interaction';
 import {fromLonLat, toLonLat} from 'ol/proj';
+
+function antipode(coord) {
+    let long = coord[0] == 0 ? 180 : Math.sign(coord[0]) * (Math.abs(coord[0]) - 180),
+        lat = -coord[1];
+    return [long, lat];
+}
 
 const map_a = new Map({
     target: 'map_a',
@@ -25,7 +32,7 @@ const map_b = new Map({
         })
     ],
     view: new View({
-        center: [0, 0],
+        center: [-74.15, -21.05],
         zoom: 4
     })
 });
@@ -45,10 +52,27 @@ map_a.on('moveend', () => {
     left_lat.innerHTML = parseFloat(coord[1].toFixed(4));
     llongi.value = parseFloat(coord[0].toFixed(4));
     llati.value = parseFloat(coord[1].toFixed(4));
+    map_b.getView().animate({
+        center: fromLonLat(antipode(coord)),
+        zoom: map_a.getView().getZoom(),
+        rotation: map_a.getView().getRotation()
+    });
 });
 
 map_b.on('moveend', () => {
     let coord = toLonLat(map_b.getView().getCenter());
     right_long.innerHTML = parseFloat(coord[0].toFixed(4));
     right_lat.innerHTML = parseFloat(coord[1].toFixed(4));
+    map_a.getView().animate({
+        center: fromLonLat(antipode(coord)),
+        zoom: map_b.getView().getZoom(),
+        rotation: map_b.getView().getRotation()
+    });
 });
+
+button.onclick = () => {
+    let coord = fromLonLat([llongi.value, llati.value]);
+    map_a.getView().animate({
+        center: coord
+    });
+};
