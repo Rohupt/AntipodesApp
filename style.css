@@ -43,3 +43,12 @@
     top: 240px;
     left: 290px;
 }
+
+.home {
+    top: 65px;
+    left: .5em;
+}
+
+.ol-touch .home {
+    top: 80px;
+}

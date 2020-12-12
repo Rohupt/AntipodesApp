@@ -31,6 +31,40 @@ var Crosshair = function(Control) {
     return Crosshair;
 }(Control);
 
+var HomeControl = function (Control) {
+    function HomeControl(opt_options) {
+        var options = opt_options || {};
+  
+        var button = document.createElement('button');
+        button.innerHTML = 'H';
+  
+        var element = document.createElement('div');
+        element.className = 'home ol-unselectable ol-control';
+        element.appendChild(button);
+  
+        Control.call(this, {
+            element: element,
+            target: options.target,
+        });
+  
+        button.addEventListener('click', this.handleHome.bind(this), false);
+    }
+  
+    if (Control) HomeControl.__proto__ = Control;
+    HomeControl.prototype = Object.create( Control && Control.prototype );
+    HomeControl.prototype.constructor = HomeControl;
+  
+    HomeControl.prototype.handleHome = function handleHome() {
+      this.getMap().getView().animate({
+        center: fromLonLat([105.85, 21.05]),
+        zoom: 4,
+        rotation: 0
+      });
+    };
+  
+    return HomeControl;
+  }(Control);
+
 function antipode(coord) {
     let long = coord[0] == 0 ? 180 : Math.sign(coord[0]) * (Math.abs(coord[0]) - 180),
         lat = -coord[1];
@@ -38,7 +72,7 @@ function antipode(coord) {
 }
 
 const map_a = new Map({
-    controls: defaultControls().extend([new Crosshair()]),
+    controls: defaultControls().extend([new Crosshair(), new HomeControl()]),
     target: 'map_a',
     layers: [
         new TileLayer({
