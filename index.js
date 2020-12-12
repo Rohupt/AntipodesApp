@@ -76,7 +76,7 @@ var
     llongi = document.getElementById("left_long_input"),
     llati = document.getElementById("left_lat_input"),
     button = document.getElementById("button"),
-    log = document.getElementById("log");
+    capt = document.getElementById("capitals");
 
 function antipode(coord) {
     let long = coord[0] == 0 ? 180 : Math.sign(coord[0]) * (Math.abs(coord[0]) - 180),
@@ -85,7 +85,18 @@ function antipode(coord) {
 };
 
 function dist(capital, coord) {
-    return (coord[0] - parseFloat(capital.CapitalLongitude))**2 + (coord[1] - parseFloat(capital.CapitalLatitude))**2;
+    let lon1 = parseFloat(capital.CapitalLongitude);
+    let lat1 = parseFloat(capital.CapitalLatitude);
+    let lon2 = coord[0];
+    let lat2 = coord[1];
+    let dLat = (lat2 - lat1) * (Math.PI/180);
+    let dLon = (lon2 - lon1) * (Math.PI/180);
+    let a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * (Math.PI/180)) * Math.cos(lat2 * (Math.PI/180)) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2)
+    ; 
+    return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 };
 
 function nearestCapt(coord) {
@@ -120,11 +131,18 @@ const map_b = new Map({
     })
 });
 
+capitals.sort((a, b) => a.CountryName < b.CountryName ? -1 : a.CountryName > b.CountryName ? 1 : 0).forEach(capital => {
+    let op = document.createElement('option');
+    op.value = capital.CapitalName;
+    op.innerHTML = `${capital.CountryName}: ${capital.CapitalName}`;
+    capt.appendChild(op);
+})
+
 map_a.on('moveend', () => {
     let coord = toLonLat(map_a.getView().getCenter()), city = nearestCapt(coord);
     left_long.innerHTML = parseFloat(coord[0].toFixed(4));
     left_lat.innerHTML = parseFloat(coord[1].toFixed(4));
-    left_city.innerHTML = `${city.CapitalName}, ${city.CountryName}`;
+    left_city.innerHTML = `${city.CapitalName}, ${city.CountryName} (${dist(city, coord).toFixed(3)} km)`;
     llongi.value = parseFloat(coord[0].toFixed(4));
     llati.value = parseFloat(coord[1].toFixed(4));
     map_b.getView().animate({
@@ -138,7 +156,7 @@ map_b.on('moveend', () => {
     let coord = toLonLat(map_b.getView().getCenter()), city = nearestCapt(coord);
     right_long.innerHTML = parseFloat(coord[0].toFixed(4));
     right_lat.innerHTML = parseFloat(coord[1].toFixed(4));
-    right_city.innerHTML = `${city.CapitalName}, ${city.CountryName}`;
+    right_city.innerHTML = `${city.CapitalName}, ${city.CountryName} (${dist(city, coord).toFixed(3)} km)`;
     map_a.getView().animate({
         center: fromLonLat(antipode(coord)),
         zoom: map_b.getView().getZoom(),
@@ -152,3 +170,13 @@ button.onclick = () => {
         center: coord
     });
 };
+
+capt.onchange = () => {
+    let city = capitals.find(capital => capital.CapitalName == capt.value);
+    let coord = fromLonLat([parseFloat(city.CapitalLongitude), parseFloat(city.CapitalLatitude)]);
+    map_a.getView().animate({
+        center: coord,
+        zoom: 4,
+        rotation: 0
+    });
+}
