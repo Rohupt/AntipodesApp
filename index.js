@@ -2,8 +2,34 @@ import 'ol/ol.css';
 import {Map, View} from 'ol';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
-import {defaults} from 'ol/interaction';
 import {fromLonLat, toLonLat} from 'ol/proj';
+import {Control, defaults as defaultControls} from 'ol/control';
+
+var Crosshair = function(Control) {
+    function Crosshair(opt_options) {
+        var options = opt_options || {};
+  
+        var img = document.createElement('img');
+        img.src = require('./crosshair.png');
+        img.style.height = '20px';
+        img.style.width = '20px';
+    
+        var element = document.createElement('div');
+        element.className = 'crosshair ol-unselectable';
+        element.appendChild(img);
+  
+        Control.call(this, {
+            element: element,
+            target: options.target,
+        });
+    }
+  
+    if (Control) Crosshair.__proto__ = Control;
+    Crosshair.prototype = Object.create( Control && Control.prototype );
+    Crosshair.prototype.constructor = Crosshair;
+  
+    return Crosshair;
+}(Control);
 
 function antipode(coord) {
     let long = coord[0] == 0 ? 180 : Math.sign(coord[0]) * (Math.abs(coord[0]) - 180),
@@ -12,6 +38,7 @@ function antipode(coord) {
 }
 
 const map_a = new Map({
+    controls: defaultControls().extend([new Crosshair()]),
     target: 'map_a',
     layers: [
         new TileLayer({
@@ -25,6 +52,7 @@ const map_a = new Map({
 });
 
 const map_b = new Map({
+    controls: defaultControls().extend([new Crosshair()]),
     target: 'map_b',
     layers: [
         new TileLayer({
