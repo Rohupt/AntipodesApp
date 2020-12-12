@@ -4,6 +4,7 @@ import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
 import {fromLonLat, toLonLat} from 'ol/proj';
 import {Control, defaults as defaultControls} from 'ol/control';
+const capitals = require('./country-capitals.json');
 
 var Crosshair = function(Control) {
     function Crosshair(opt_options) {
@@ -65,10 +66,30 @@ var HomeControl = function (Control) {
     return HomeControl;
   }(Control);
 
+var 
+    left_long = document.getElementById("left_long"),
+    left_lat = document.getElementById("left_lat"),
+    left_city = document.getElementById("left_city"),
+    right_long = document.getElementById("right_long"),
+    right_lat = document.getElementById("right_lat"),
+    right_city = document.getElementById("right_city"),
+    llongi = document.getElementById("left_long_input"),
+    llati = document.getElementById("left_lat_input"),
+    button = document.getElementById("button"),
+    log = document.getElementById("log");
+
 function antipode(coord) {
     let long = coord[0] == 0 ? 180 : Math.sign(coord[0]) * (Math.abs(coord[0]) - 180),
         lat = -coord[1];
     return [long, lat];
+};
+
+function dist(capital, coord) {
+    return (coord[0] - parseFloat(capital.CapitalLongitude))**2 + (coord[1] - parseFloat(capital.CapitalLatitude))**2;
+};
+
+function nearestCapt(coord) {
+    return capitals.sort((a, b) => dist(a, coord) - dist(b, coord))[0];
 }
 
 const map_a = new Map({
@@ -99,19 +120,11 @@ const map_b = new Map({
     })
 });
 
-var 
-    left_long = document.getElementById("left_long"),
-    left_lat = document.getElementById("left_lat"),
-    right_long = document.getElementById("right_long"),
-    right_lat = document.getElementById("right_lat"),
-    llongi = document.getElementById("left_long_input"),
-    llati = document.getElementById("left_lat_input"),
-    button = document.getElementById("button");
-
 map_a.on('moveend', () => {
-    let coord = toLonLat(map_a.getView().getCenter());
+    let coord = toLonLat(map_a.getView().getCenter()), city = nearestCapt(coord);
     left_long.innerHTML = parseFloat(coord[0].toFixed(4));
     left_lat.innerHTML = parseFloat(coord[1].toFixed(4));
+    left_city.innerHTML = `${city.CapitalName}, ${city.CountryName}`;
     llongi.value = parseFloat(coord[0].toFixed(4));
     llati.value = parseFloat(coord[1].toFixed(4));
     map_b.getView().animate({
@@ -122,9 +135,10 @@ map_a.on('moveend', () => {
 });
 
 map_b.on('moveend', () => {
-    let coord = toLonLat(map_b.getView().getCenter());
+    let coord = toLonLat(map_b.getView().getCenter()), city = nearestCapt(coord);
     right_long.innerHTML = parseFloat(coord[0].toFixed(4));
     right_lat.innerHTML = parseFloat(coord[1].toFixed(4));
+    right_city.innerHTML = `${city.CapitalName}, ${city.CountryName}`;
     map_a.getView().animate({
         center: fromLonLat(antipode(coord)),
         zoom: map_b.getView().getZoom(),
