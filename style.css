@@ -37,3 +37,9 @@
 .right_coord {
     width: 150px;
 }
+
+.crosshair {
+    position: absolute;
+    top: 240px;
+    left: 290px;
+}
