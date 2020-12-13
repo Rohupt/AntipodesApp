@@ -100,7 +100,10 @@ function dist(capital, coord) {
 };
 
 function nearestCapt(coord) {
-    return capitals.sort((a, b) => dist(a, coord) - dist(b, coord))[0];
+    let capt = capitals.sort((a, b) => dist(a, coord) - dist(b, coord))[0];
+    if (capt.CountryName == 'US Minor Outlying Islands')
+        capt = capitals.find(c => c.CountryName == 'United States');
+    return capt;
 }
 
 const map_a = new Map({
@@ -133,7 +136,7 @@ const map_b = new Map({
 
 capitals.sort((a, b) => a.CountryName < b.CountryName ? -1 : a.CountryName > b.CountryName ? 1 : 0).forEach(capital => {
     let op = document.createElement('option');
-    op.value = capital.CapitalName;
+    op.value = capital.CountryName;
     op.innerHTML = `${capital.CountryName}: ${capital.CapitalName}`;
     capt.appendChild(op);
 })
@@ -142,7 +145,7 @@ map_a.on('moveend', () => {
     let coord = toLonLat(map_a.getView().getCenter()), city = nearestCapt(coord);
     left_long.innerHTML = parseFloat(coord[0].toFixed(4));
     left_lat.innerHTML = parseFloat(coord[1].toFixed(4));
-    left_city.innerHTML = `${city.CapitalName}, ${city.CountryName} (${dist(city, coord).toFixed(3)} km)`;
+    left_city.innerHTML = `${city.CapitalName}, ${city.CountryName} (${dist(city, coord).toFixed(2)} km)`;
     llongi.value = parseFloat(coord[0].toFixed(4));
     llati.value = parseFloat(coord[1].toFixed(4));
     map_b.getView().animate({
@@ -156,7 +159,7 @@ map_b.on('moveend', () => {
     let coord = toLonLat(map_b.getView().getCenter()), city = nearestCapt(coord);
     right_long.innerHTML = parseFloat(coord[0].toFixed(4));
     right_lat.innerHTML = parseFloat(coord[1].toFixed(4));
-    right_city.innerHTML = `${city.CapitalName}, ${city.CountryName} (${dist(city, coord).toFixed(3)} km)`;
+    right_city.innerHTML = `${city.CapitalName}, ${city.CountryName} (${dist(city, coord).toFixed(2)} km)`;
     map_a.getView().animate({
         center: fromLonLat(antipode(coord)),
         zoom: map_b.getView().getZoom(),
@@ -173,7 +176,7 @@ button.onclick = () => {
 };
 
 capt.onchange = () => {
-    let city = capitals.find(capital => capital.CapitalName == capt.value);
+    let city = capitals.find(capital => capital.CountryName == capt.value);
     let coord = fromLonLat([parseFloat(city.CapitalLongitude), parseFloat(city.CapitalLatitude)]);
     map_a.getView().animate({
         center: coord,

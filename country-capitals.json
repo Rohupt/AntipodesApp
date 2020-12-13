@@ -1922,16 +1922,16 @@
     {
         "CountryName":"Hong Kong",
         "CapitalName":"N/A",
-        "CapitalLatitude":"0",
-        "CapitalLongitude":"0.000000",
+        "CapitalLatitude":"22.31666666",
+        "CapitalLongitude":"114.16666666",
         "CountryCode":"HK",
         "ContinentName":"Asia"
     },
     {
         "CountryName":"Heard Island and McDonald Islands",
         "CapitalName":"N/A",
-        "CapitalLatitude":"0",
-        "CapitalLongitude":"0.000000",
+        "CapitalLatitude":"-53.1",
+        "CapitalLongitude":"73.5",
         "CountryCode":"HM",
         "ContinentName":"Antarctica"
     },
@@ -1946,8 +1946,8 @@
     {
         "CountryName":"Macau",
         "CapitalName":"N/A",
-        "CapitalLatitude":"0",
-        "CapitalLongitude":"0.000000",
+        "CapitalLatitude":"22.1972222",
+        "CapitalLongitude":"113.5416666",
         "CountryCode":"MO",
         "ContinentName":"Asia"
     }
