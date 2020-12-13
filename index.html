@@ -8,9 +8,6 @@
     <body>
         <div class="container" id="left_container">
             <div class="map" id="map_a"></div>
-            <p>Longitude:&Tab;<span id="left_long"></span></p>
-            <p>Latitude:&Tab;<span id="left_lat"></span></p>
-            <p>Nearest capital city:&Tab;<span id='left_city'></span></p>
             <div class="form">
                 <label for="left_long_input">Long:</label>
                 <input id="left_long_input" type="number" step="0.01" min="-180" max="180"/>
@@ -18,16 +15,19 @@
                 <input id="left_lat_input" type="number" step="0.01" min="-90" max="90"/>
                 <button id="button">Move to</button>
             </div>
+            <p>Longitude:&Tab;<span id="left_long"></span></p>
+            <p>Latitude:&Tab;<span id="left_lat"></span></p>
+            <p>Nearest capital city:&Tab;<span id='left_city'></span></p>
         </div>
         <div class="container" id="right_container">
             <div class="map" id="map_b"></div>
-            <p>Longitude:&Tab;<span id="right_long"></span></p>
-            <p>Latitude:&Tab;<span id="right_lat"></span></p>
-            <p>Nearest capital city:&Tab;<span id='right_city'></span></p>
             <div class="form">
                 <label for="capitals">Go to:</label>
                 <select id="capitals"></select>
             </div>
+            <p>Longitude:&Tab;<span id="right_long"></span></p>
+            <p>Latitude:&Tab;<span id="right_lat"></span></p>
+            <p>Nearest capital city:&Tab;<span id='right_city'></span></p>
         </div>
         <script src="./index.js"></script>
     </body>

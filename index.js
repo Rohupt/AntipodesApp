@@ -165,6 +165,7 @@ map_b.on('moveend', () => {
 });
 
 button.onclick = () => {
+    if (!llongi.value || ! llati.value) return;
     let coord = fromLonLat([llongi.value, llati.value]);
     map_a.getView().animate({
         center: coord
