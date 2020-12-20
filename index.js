@@ -4,6 +4,7 @@ import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
 import {fromLonLat, toLonLat} from 'ol/proj';
 import {Control, defaults as defaultControls} from 'ol/control';
+import {getDistance} from 'ol/sphere';
 const capitals = require('./country-capitals.json');
 
 var Crosshair = function(Control) {
@@ -91,16 +92,18 @@ function dist(capital, coord) {
     let lat2 = coord[1];
     let dLat = (lat2 - lat1) * (Math.PI/180);
     let dLon = (lon2 - lon1) * (Math.PI/180);
-    let a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * (Math.PI/180)) * Math.cos(lat2 * (Math.PI/180)) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2)
-    ; 
+    let a = Math.sin(dLat/2) ** 2 + Math.cos(lat1 * (Math.PI/180)) * Math.cos(lat2 * (Math.PI/180)) * Math.sin(dLon/2) ** 2;
     return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 };
 
+function dist2(capital, coord) {
+    let captCoord = [parseFloat(capital.CapitalLongitude), capital.CapitalLatitude];
+    return getDistance(captCoord, coord) / 1000;
+}
+
 function nearestCapt(coord) {
-    let capt = capitals.sort((a, b) => dist(a, coord) - dist(b, coord))[0];
+    let captTemp = capitals;
+    let capt = captTemp.filter(city => dist(city, coord) !== NaN).sort((a, b) => dist(a, coord) - dist(b, coord))[0];
     if (capt.CountryName == 'US Minor Outlying Islands')
         capt = capitals.find(c => c.CountryName == 'United States');
     return capt;
@@ -159,7 +162,7 @@ map_b.on('moveend', () => {
     let coord = toLonLat(map_b.getView().getCenter()), city = nearestCapt(coord);
     right_long.innerHTML = parseFloat(coord[0].toFixed(4));
     right_lat.innerHTML = parseFloat(coord[1].toFixed(4));
-    right_city.innerHTML = `${city.CapitalName}, ${city.CountryName} (${dist(city, coord).toFixed(2)} km)`;
+    right_city.innerHTML = `${city.CapitalName}, ${city.CountryName} (${dist2(city, coord).toFixed(2)} km)`;
     map_a.getView().animate({
         center: fromLonLat(antipode(coord)),
         zoom: map_b.getView().getZoom(),
@@ -168,11 +171,34 @@ map_b.on('moveend', () => {
 });
 
 button.onclick = () => {
-    if (!llongi.value || ! llati.value) return;
+    if (!llongi.value || !llati.value) return;
+    if (llongi.value < -180 || llongi.value > 180) {
+        setTimeout(() => { llongi.classList.add("backgroundRed"); }, 500);
+        return;
+    } else setTimeout(() => { llongi.classList.remove("backgroundRed"); }, 500);
+    if (llati.value < -90 || llati.value > 90) {
+        setTimeout(() => { llati.classList.add("backgroundRed"); }, 500);
+        return;
+    } else setTimeout(() => { llati.classList.remove("backgroundRed"); }, 500);
+    if (llongi.value == -180) llongi.value = 180;
     let coord = fromLonLat([llongi.value, llati.value]);
     map_a.getView().animate({
         center: coord
     });
+};
+
+llongi.onkeyup = (e) => {  
+    if (e.keyCode === 13) {
+        e.preventDefault();
+        button.click();
+    }
+};
+
+llati.onkeyup = (e) => {  
+    if (e.keyCode === 13) {
+        e.preventDefault();
+        button.click();
+    }
 };
 
 capt.onchange = () => {
@@ -183,4 +209,4 @@ capt.onchange = () => {
         zoom: 4,
         rotation: 0
     });
-}
+};

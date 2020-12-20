@@ -20,8 +20,9 @@
 
 .form input{
     display: inline-block;
-    width: 150px;
+    width: 75px;
     margin: 5px;
+    transition: background 0.5s ease-in-out;
 }
 
 .container {
@@ -51,4 +52,8 @@
 
 .ol-touch .home {
     top: 80px;
+}
+
+.backgroundRed{
+    background-color: #ff5050;
 }
